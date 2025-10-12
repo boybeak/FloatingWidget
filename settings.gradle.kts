@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "FloatingWidget"
 include(":app")
 include(":floatingwidget")
+include(":fpspet")

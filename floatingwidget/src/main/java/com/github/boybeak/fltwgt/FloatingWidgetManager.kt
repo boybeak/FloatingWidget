@@ -4,32 +4,25 @@ import android.content.Context
 import android.view.Gravity
 import android.view.WindowManager
 import android.widget.TextView
+import java.lang.ref.WeakReference
 
-object FloatingWidgetManager {
+class FloatingWidgetManager(context: Context) {
 
-    private lateinit var winMan: WindowManager
+    private var contextRef = WeakReference(context)
+    private val winMan: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
-    fun init(context: Context) {
-        winMan = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-    }
+    private val widgets = mutableListOf<FloatingWidget>()
+
+    val size: Int
+        get() = widgets.size
+
+    val hasWidgets: Boolean
+        get() = widgets.isNotEmpty()
 
     fun checkPermission(context: Context): Boolean {
         return context.packageManager.checkPermission(
             android.Manifest.permission.SYSTEM_ALERT_WINDOW,
             context.packageName
         ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-    }
-
-    fun createWidget(context: Context) {
-        val view = TextView(context)
-        val params = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-            android.graphics.PixelFormat.TRANSLUCENT
-        )
-        params.gravity = Gravity.TOP or Gravity.LEFT
-        winMan.addView(view, params)
     }
 }
