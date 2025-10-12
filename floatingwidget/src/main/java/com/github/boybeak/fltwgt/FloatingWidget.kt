@@ -91,13 +91,7 @@ class FloatingWidget private constructor(val view: View) {
     }
 
     fun setClickThrough(enabled: Boolean) = update {
-        this.flags = if (enabled) {
-            this.flags and WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv()
-            this.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        } else {
-            this.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
-            this.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-        }
+        this.setClickThrough(enabled)
     }
 
     fun setDraggable(draggable: Boolean) {
@@ -148,13 +142,7 @@ class FloatingWidget private constructor(val view: View) {
         }
 
         fun setClickThrough(enabled: Boolean): Builder {
-            layoutParams.flags = if (enabled) {
-                layoutParams.flags and WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv()
-                layoutParams.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-            } else {
-                layoutParams.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
-                layoutParams.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-            }
+            layoutParams.setClickThrough(enabled)
             return this
         }
 
@@ -183,6 +171,14 @@ class FloatingWidget private constructor(val view: View) {
         }
     }
 
+}
 
-
+private fun WindowManager.LayoutParams.setClickThrough(enabled: Boolean) {
+    this.flags = if (enabled) {
+        this.flags and WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv()
+        this.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+    } else {
+        this.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
+        this.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+    }
 }

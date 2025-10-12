@@ -1,14 +1,20 @@
 package com.github.boybeak.fpspet.widget
 
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.PixelFormat
+import android.graphics.PorterDuff
 import android.util.AttributeSet
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.util.Log
+import android.view.SurfaceHolder
+import android.view.SurfaceView
+import androidx.core.content.res.ResourcesCompat
 import com.github.boybeak.fpspet.FPS
 import com.github.boybeak.fpspet.R
 
-class FPSWidget : LinearLayout {
+class FPSWidget : SurfaceView {
 
     private val fps = object : FPS() {
         private var counter = 0
@@ -16,8 +22,9 @@ class FPSWidget : LinearLayout {
         override fun onFrame(fps: Float) {
             if (counter == 0) {
                 frameIndex = (frameIndex + 1) % images.size
-                fpsImage.setImageResource(images[frameIndex])
-                fpsText.text = "%.2f".format(fps)
+                currentImage = ResourcesCompat.getDrawable(resources, images[frameIndex], null)
+                fpsText = "$fps"
+                draw()
             }
             counter++
             if (counter == 10) {
@@ -41,16 +48,43 @@ class FPSWidget : LinearLayout {
         R.drawable.fa_ducky_walk_011,
     )
 
-    private val fpsText by lazy { TextView(context) }
-    private val fpsImage by lazy { ImageView(context) }
+    private var currentImage = ResourcesCompat.getDrawable(resources, images[0], null)
+    private var fpsText: String = ""
+
+    private val paint = Paint().apply {
+        color = Color.BLUE
+        textSize = 30f
+    }
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     init {
-        addView(fpsText)
-        addView(fpsImage)
+        setZOrderOnTop(true)
+        holder.setFormat(PixelFormat.TRANSLUCENT)
+        holder.addCallback(object : SurfaceHolder.Callback {
+            override fun surfaceCreated(holder: SurfaceHolder) {
+                Log.d("FPSWidget", "surfaceCreated: $holder")
+            }
+
+            override fun surfaceChanged(
+                holder: SurfaceHolder,
+                format: Int,
+                width: Int,
+                height: Int
+            ) {
+                Log.d("FPSWidget", "surfaceChanged: $holder, $format, $width, $height")
+            }
+
+            override fun surfaceDestroyed(holder: SurfaceHolder) {
+                Log.d("FPSWidget", "surfaceDestroyed: $holder")
+            }
+        })
     }
 
     override fun onAttachedToWindow() {
@@ -61,6 +95,19 @@ class FPSWidget : LinearLayout {
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         fps.stop()
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val widSpec = MeasureSpec.makeMeasureSpec(800, MeasureSpec.EXACTLY)
+        val heiSpec = MeasureSpec.makeMeasureSpec(800, MeasureSpec.EXACTLY)
+        super.onMeasure(widSpec, heiSpec)
+    }
+
+    private fun draw() {
+        val canvas = holder.lockCanvas()
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        canvas.drawText(fpsText, 100f, 100f, paint)
+        holder.unlockCanvasAndPost(canvas)
     }
 
 }
