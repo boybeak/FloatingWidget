@@ -1,6 +1,7 @@
 package com.github.boybeak.fltwgt
 
 import android.content.Context
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -135,6 +136,13 @@ class FloatingWidget private constructor(val view: View) {
         )
 
         private var draggable = false
+
+        constructor() : this(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            else
+                WindowManager.LayoutParams.TYPE_PHONE
+        )
 
         fun setGravity(gravity: Int): Builder {
             layoutParams.gravity = gravity

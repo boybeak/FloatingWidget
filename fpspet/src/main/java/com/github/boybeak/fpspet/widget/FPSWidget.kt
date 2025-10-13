@@ -98,8 +98,8 @@ class FPSWidget : SurfaceView {
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val widSpec = MeasureSpec.makeMeasureSpec(800, MeasureSpec.EXACTLY)
-        val heiSpec = MeasureSpec.makeMeasureSpec(800, MeasureSpec.EXACTLY)
+        val widSpec = MeasureSpec.makeMeasureSpec(200, MeasureSpec.EXACTLY)
+        val heiSpec = MeasureSpec.makeMeasureSpec(200, MeasureSpec.EXACTLY)
         super.onMeasure(widSpec, heiSpec)
     }
 
