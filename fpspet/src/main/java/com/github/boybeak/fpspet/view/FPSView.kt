@@ -1,20 +1,24 @@
-package com.github.boybeak.fpspet.widget
+package com.github.boybeak.fpspet.view
 
 import android.content.Context
-import android.graphics.Canvas
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PixelFormat
 import android.graphics.PorterDuff
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import androidx.core.content.res.ResourcesCompat
-import com.github.boybeak.fpspet.FPS
 import com.github.boybeak.fpspet.R
+import com.github.boybeak.fpspet.ext.isDebuggable
+import com.github.boybeak.fpspet.utils.FPS
+import kotlin.getValue
+import kotlin.math.roundToInt
 
-class FPSWidget : SurfaceView {
+class FPSView : SurfaceView {
 
     private val fps = object : FPS() {
         private var counter = 0
@@ -22,12 +26,12 @@ class FPSWidget : SurfaceView {
         override fun onFrame(fps: Float) {
             if (counter == 0) {
                 frameIndex = (frameIndex + 1) % images.size
-                currentImage = ResourcesCompat.getDrawable(resources, images[frameIndex], null)
-                fpsText = "$fps"
+                currentImage = BitmapFactory.decodeResource(resources, images[frameIndex])
+                fpsText = "${fps.roundToInt()}"
                 draw()
             }
             counter++
-            if (counter == 10) {
+            if (counter == 6) {
                 counter = 0
             }
         }
@@ -48,12 +52,35 @@ class FPSWidget : SurfaceView {
         R.drawable.fa_ducky_walk_011,
     )
 
-    private var currentImage = ResourcesCompat.getDrawable(resources, images[0], null)
+    private val _srcRect = Rect(0, 0, 0, 0)
+    private val srcRect: Rect get() {
+        _srcRect.set(0, 0, currentImage.width, currentImage.height)
+        return _srcRect
+    }
+    private val _dstRect = Rect(0, 0, 0, 0)
+    private val dstRect: Rect get() {
+        _dstRect.set(0, 0, height, height)
+        return _dstRect
+    }
+    private var currentImage = BitmapFactory.decodeResource(resources, images[0])
     private var fpsText: String = ""
 
-    private val paint = Paint().apply {
+    private val debugPaint by lazy {
+        Paint().apply {
+            color = Color.DKGRAY
+            style = Paint.Style.STROKE
+            isAntiAlias = true
+        }
+    }
+
+    private val font by lazy {
+        ResourcesCompat.getFont(context, R.font.number)
+    }
+    private val textPaint = Paint().apply {
         color = Color.BLUE
-        textSize = 30f
+        textSize = 60f
+        typeface = font
+        isAntiAlias = true
     }
 
     constructor(context: Context) : super(context)
@@ -87,6 +114,8 @@ class FPSWidget : SurfaceView {
         })
     }
 
+
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         fps.start()
@@ -97,16 +126,20 @@ class FPSWidget : SurfaceView {
         fps.stop()
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val widSpec = MeasureSpec.makeMeasureSpec(200, MeasureSpec.EXACTLY)
-        val heiSpec = MeasureSpec.makeMeasureSpec(200, MeasureSpec.EXACTLY)
-        super.onMeasure(widSpec, heiSpec)
-    }
-
     private fun draw() {
         val canvas = holder.lockCanvas()
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        canvas.drawText(fpsText, 100f, 100f, paint)
+
+        if (context.isDebuggable) {
+            canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), debugPaint)
+            canvas.drawRect(dstRect, debugPaint)
+        }
+
+        canvas.drawBitmap(currentImage, srcRect, dstRect, null)
+        val textWidth = textPaint.measureText(fpsText)
+        val textX = dstRect.right.toFloat() + (width - dstRect.width()) / 2 - textWidth / 2
+        val textY = canvas.height / 2F + textPaint.textSize / 2
+        canvas.drawText(fpsText, textX, textY, textPaint)
         holder.unlockCanvasAndPost(canvas)
     }
 

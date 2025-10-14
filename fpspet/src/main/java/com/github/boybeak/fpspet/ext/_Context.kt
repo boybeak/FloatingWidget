@@ -1,6 +1,7 @@
-package com.github.boybeak.fpspet.utils
+package com.github.boybeak.fpspet.ext
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.os.Build
 import android.view.WindowManager
 import kotlin.math.roundToInt
@@ -17,4 +18,9 @@ val Context.isLTPOSupported: Boolean
         val refreshRates = display.supportedRefreshRates
 
         return refreshRates.any { it.roundToInt() <= 10 }
+    }
+
+val Context.isDebuggable: Boolean
+    get() {
+        return this.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
     }

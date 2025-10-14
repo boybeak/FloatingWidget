@@ -1,6 +1,5 @@
-package com.github.boybeak.fpspet
+package com.github.boybeak.fpspet.utils
 
-import android.util.Log
 import android.view.Choreographer
 
 abstract class FPS {

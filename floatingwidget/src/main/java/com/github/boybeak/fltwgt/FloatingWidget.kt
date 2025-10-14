@@ -87,6 +87,11 @@ class FloatingWidget private constructor(val view: View) {
     val isShowing: Boolean
         get() = view.parent != null
 
+    fun setSize(width: Int, height: Int) = update {
+        this.width = width
+        this.height = height
+    }
+
     fun setGravity(gravity: Int) = update {
         this.gravity = gravity
     }
@@ -118,7 +123,9 @@ class FloatingWidget private constructor(val view: View) {
     private fun update(block: WindowManager.LayoutParams.() -> Unit) {
         val winLayoutParams = view.layoutParams as? WindowManager.LayoutParams ?: return
         block(winLayoutParams)
-        windowManager.updateViewLayout(view, winLayoutParams)
+        if (isShowing) {
+            windowManager.updateViewLayout(view, winLayoutParams)
+        }
     }
 
     private fun <T> layoutParams(block: WindowManager.LayoutParams.() -> T): T? {
@@ -143,6 +150,12 @@ class FloatingWidget private constructor(val view: View) {
             else
                 WindowManager.LayoutParams.TYPE_PHONE
         )
+
+        fun setSize(width: Int, height: Int): Builder {
+            layoutParams.width = width
+            layoutParams.height = height
+            return this
+        }
 
         fun setGravity(gravity: Int): Builder {
             layoutParams.gravity = gravity
