@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">FpsPet</string>
+
+    <string name="tab_general">General</string>
+    <string name="tab_background">Background</string>
+    <string name="tab_border">Border</string>
+    <string name="tab_font">Font</string>
+    <string name="tab_animation">Animation</string>
+    <string name="tab_permissions">Permissions</string>
 </resources>

@@ -8,12 +8,24 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.net.toUri
+import androidx.viewpager2.widget.ViewPager2
 import com.github.boybeak.fpspet.service.PetService
+import com.github.boybeak.fpspet.ui.Tab
+import com.github.boybeak.fpspet.ui.TabPagerAdapter
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+    }
+
+    private val tabLayout by lazy {
+        findViewById<TabLayout>(R.id.tabLayout)
+    }
+    private val viewPager by lazy {
+        findViewById<ViewPager2>(R.id.viewPager)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +37,21 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        // 常规：尺寸、圆角、内边距、排列方式、是否吸附到边缘
+        // 背景：颜色、透明度
+        // 描边：颜色、透明度、粗细
+        // 动画：选择不同动画
+        // 字体：大小、颜色、斜体、加粗、字体粗细？、字体类型？
+        // 权限：悬浮窗、前台通知、自启动
+        /*Tab.entries.forEach { tab ->
+            tabLayout.addTab(tabLayout.newTab().setText(tab.titleId))
+        }*/
+
+        viewPager.adapter = TabPagerAdapter(this)
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.setText(Tab.entries[position].titleId)
+        }.attach()
 
         checkOverlayPermission()
     }
