@@ -13,6 +13,8 @@ class MainVM : ViewModel() {
     val borderWidth: LiveData<Float> get() = _borderWidth
     private val _borderColor = MutableLiveData(Color.BLUE)
     val borderColor: LiveData<Int> get() = _borderColor
+    private val _borderAlpha = MutableLiveData(255)
+    val borderAlpha: LiveData<Int> get() = _borderAlpha
 
 
     fun setCornerRadius(radius: Float) {
@@ -25,6 +27,10 @@ class MainVM : ViewModel() {
 
     fun setBorderColor(color: Int) {
         _borderColor.value = color
+    }
+
+    fun setBorderAlpha(alpha: Int) {
+        _borderAlpha.value = alpha
     }
 
 }

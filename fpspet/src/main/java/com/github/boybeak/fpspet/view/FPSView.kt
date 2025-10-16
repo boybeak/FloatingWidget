@@ -68,7 +68,8 @@ class FPSView : SurfaceView {
     private var currentImage = BitmapFactory.decodeResource(resources, images[0])
     private var fpsText: String = ""
 
-    private val broderPaint by lazy {
+    private var showBorder = true
+    private val borderPaint by lazy {
         Paint().apply {
             color = Color.DKGRAY
             style = Paint.Style.STROKE
@@ -76,8 +77,15 @@ class FPSView : SurfaceView {
             isAntiAlias = true
         }
     }
-
     private var cornerRadius = 0f
+
+    private val bgPaint by lazy {
+        Paint().apply {
+            color = Color.DKGRAY
+            style = Paint.Style.FILL
+            isAntiAlias = true
+        }
+    }
 
     private val font by lazy {
         ResourcesCompat.getFont(context, R.font.number)
@@ -134,11 +142,19 @@ class FPSView : SurfaceView {
         val canvas = holder.lockCanvas()
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
 
-        val borderLeft = broderPaint.strokeWidth / 2
-        val borderTop = broderPaint.strokeWidth / 2
-        val borderRight = width.toFloat() - broderPaint.strokeWidth / 2
-        val borderBottom = height.toFloat() - broderPaint.strokeWidth / 2
-        canvas.drawRoundRect(borderLeft, borderTop, borderRight, borderBottom, cornerRadius, cornerRadius, broderPaint)
+        if (showBorder) {
+            val borderLeft = borderPaint.strokeWidth / 2
+            val borderTop = borderPaint.strokeWidth / 2
+            val borderRight = width.toFloat() - borderPaint.strokeWidth / 2
+            val borderBottom = height.toFloat() - borderPaint.strokeWidth / 2
+            canvas.drawRoundRect(borderLeft, borderTop, borderRight, borderBottom, cornerRadius, cornerRadius, borderPaint)
+        }
+
+        val bgLeft = borderPaint.strokeWidth
+        val bgTop = borderPaint.strokeWidth
+        val bgRight = width.toFloat() - borderPaint.strokeWidth
+        val bgBottom = height.toFloat() - borderPaint.strokeWidth
+        canvas.drawRoundRect(bgLeft, bgTop, bgRight, bgBottom, cornerRadius, cornerRadius, bgPaint)
 
         canvas.drawBitmap(currentImage, srcRect, dstRect, null)
         val textWidth = textPaint.measureText(fpsText)
@@ -148,16 +164,24 @@ class FPSView : SurfaceView {
         holder.unlockCanvasAndPost(canvas)
     }
 
+    fun setShowBorder(show: Boolean) {
+
+    }
+
     fun setCornerRadius(radius: Float) {
         this.cornerRadius = radius
     }
 
     fun setBorderWidth(width: Float) {
-        broderPaint.strokeWidth = width
+        borderPaint.strokeWidth = width
     }
 
     fun setBorderColor(color: Int) {
-        broderPaint.color = color
+        borderPaint.color = color
+    }
+
+    fun setBorderAlpha(alpha: Int) {
+        borderPaint.alpha = alpha
     }
 
 }

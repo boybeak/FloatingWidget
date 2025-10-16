@@ -30,6 +30,9 @@ class GeneralFragment : Fragment() {
     private val previewColor by lazy {
         view?.findViewById<View>(R.id.previewColor)
     }
+    private val seekBorderAlpha by lazy {
+        view?.findViewById<SeekBar>(R.id.seekBorderAlpha)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -99,6 +102,27 @@ class GeneralFragment : Fragment() {
             )
             colorPicker.show()
         }
+        seekBorderAlpha?.max = 255
+        seekBorderAlpha?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(
+                seekBar: SeekBar?,
+                progress: Int,
+                fromUser: Boolean
+            ) {
+                if (!fromUser) {
+                    return
+                }
+                val progress = seekBar?.progress ?: return
+                mainVM.setBorderAlpha(progress)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                val progress = seekBar?.progress ?: return
+                mainVM.setBorderAlpha(progress)
+            }
+        })
     }
 
 }

@@ -13,5 +13,6 @@
     <string name="title_corner_radius">Corner</string>
     <string name="title_border_width">Width</string>
     <string name="title_color">Color</string>
+    <string name="title_alpha">Alpha</string>
     <string name="title_auto_snap">Auto Snap</string>
 </resources>

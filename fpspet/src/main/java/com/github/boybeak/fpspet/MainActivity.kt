@@ -70,6 +70,9 @@ class MainActivity : AppCompatActivity() {
         mainVM.borderColor.observe(this) {
             fpsView.setBorderColor(it)
         }
+        mainVM.borderAlpha.observe(this) {
+            fpsView.setBorderAlpha(it)
+        }
 
         checkOverlayPermission()
     }
