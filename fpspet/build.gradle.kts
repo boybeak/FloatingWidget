@@ -46,6 +46,13 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
 
+    // Java language implementation
+    implementation(libs.androidx.preference)
+    // Kotlin
+    implementation(libs.androidx.preference.ktx)
+
+    implementation(libs.ambilwarna)
+
     implementation(project(":floatingwidget"))
 
     testImplementation(libs.junit)

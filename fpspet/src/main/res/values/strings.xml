@@ -7,4 +7,11 @@
     <string name="tab_font">Font</string>
     <string name="tab_animation">Animation</string>
     <string name="tab_permissions">Permissions</string>
+
+    <string name="title_border">Border</string>
+    <string name="title_behavior">Behavior</string>
+    <string name="title_corner_radius">Corner</string>
+    <string name="title_border_width">Width</string>
+    <string name="title_color">Color</string>
+    <string name="title_auto_snap">Auto Snap</string>
 </resources>

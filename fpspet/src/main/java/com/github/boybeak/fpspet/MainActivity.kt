@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -12,6 +13,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.github.boybeak.fpspet.service.PetService
 import com.github.boybeak.fpspet.ui.Tab
 import com.github.boybeak.fpspet.ui.TabPagerAdapter
+import com.github.boybeak.fpspet.view.FPSView
+import com.github.boybeak.fpspet.vm.MainVM
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -21,6 +24,11 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
     }
 
+    private val mainVM: MainVM by viewModels()
+
+    private val fpsView by lazy {
+        findViewById<FPSView>(R.id.fpsView)
+    }
     private val tabLayout by lazy {
         findViewById<TabLayout>(R.id.tabLayout)
     }
@@ -52,6 +60,16 @@ class MainActivity : AppCompatActivity() {
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.setText(Tab.entries[position].titleId)
         }.attach()
+
+        mainVM.cornerRadius.observe(this) { radius ->
+            fpsView.setCornerRadius(radius)
+        }
+        mainVM.borderWidth.observe(this) {
+            fpsView.setBorderWidth(it)
+        }
+        mainVM.borderColor.observe(this) {
+            fpsView.setBorderColor(it)
+        }
 
         checkOverlayPermission()
     }
