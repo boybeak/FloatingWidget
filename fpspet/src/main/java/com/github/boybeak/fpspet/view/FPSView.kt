@@ -166,7 +166,7 @@ class FPSView : SurfaceView {
     }
 
     fun setShowBorder(show: Boolean) {
-
+        this.showBorder = show
     }
 
     fun setCornerRadius(radius: Float) {
@@ -183,6 +183,22 @@ class FPSView : SurfaceView {
 
     fun setBorderAlpha(alpha: Int) {
         borderPaint.alpha = alpha
+    }
+
+    override fun setBackgroundColor(color: Int) {
+        bgPaint.color = color
+    }
+
+    fun setBackgroundColorAlpha(alpha: Int) {
+        bgPaint.alpha = alpha
+    }
+
+    fun setTextColor(color: Int) {
+        textPaint.color = color
+    }
+
+    fun setTextSize(size: Float) {
+        textPaint.textSize = size
     }
 
 }
