@@ -97,6 +97,10 @@ class FPSView : SurfaceView {
         isAntiAlias = true
     }
 
+    private var showBackground: Boolean = true
+    private var showText: Boolean = true
+    private var showImage: Boolean = true
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
@@ -150,18 +154,26 @@ class FPSView : SurfaceView {
             canvas.drawRoundRect(borderLeft, borderTop, borderRight, borderBottom, cornerRadius, cornerRadius, borderPaint)
         }
 
-        val bgLeft = borderPaint.strokeWidth
-        val bgTop = borderPaint.strokeWidth
-        val bgRight = width.toFloat() - borderPaint.strokeWidth
-        val bgBottom = height.toFloat() - borderPaint.strokeWidth
-        val innerCornerRadius = cornerRadius - borderPaint.strokeWidth / 2
-        canvas.drawRoundRect(bgLeft, bgTop, bgRight, bgBottom, innerCornerRadius, innerCornerRadius, bgPaint)
+        if (showBackground) {
+            val bgLeft = borderPaint.strokeWidth
+            val bgTop = borderPaint.strokeWidth
+            val bgRight = width.toFloat() - borderPaint.strokeWidth
+            val bgBottom = height.toFloat() - borderPaint.strokeWidth
+            val innerCornerRadius = cornerRadius - borderPaint.strokeWidth / 2
+            canvas.drawRoundRect(bgLeft, bgTop, bgRight, bgBottom, innerCornerRadius, innerCornerRadius, bgPaint)
+        }
 
-        canvas.drawBitmap(currentImage, srcRect, dstRect, null)
-        val textWidth = textPaint.measureText(fpsText)
-        val textX = dstRect.right.toFloat() + (width - dstRect.width()) / 2 - textWidth / 2
-        val textY = canvas.height / 2F + textPaint.textSize / 2
-        canvas.drawText(fpsText, textX, textY, textPaint)
+        if (showImage) {
+            canvas.drawBitmap(currentImage, srcRect, dstRect, null)
+        }
+
+        if (showText) {
+            val textWidth = textPaint.measureText(fpsText)
+            val textX = dstRect.right.toFloat() + (width - dstRect.width()) / 2 - textWidth / 2
+            val textY = canvas.height / 2F + textPaint.textSize / 2
+            canvas.drawText(fpsText, textX, textY, textPaint)
+        }
+
         holder.unlockCanvasAndPost(canvas)
     }
 
@@ -193,12 +205,24 @@ class FPSView : SurfaceView {
         bgPaint.alpha = alpha
     }
 
+    fun setShowBackground(show: Boolean) {
+        this.showBackground = show
+    }
+
     fun setTextColor(color: Int) {
         textPaint.color = color
     }
 
     fun setTextSize(size: Float) {
         textPaint.textSize = size
+    }
+
+    fun setShowImage(show: Boolean) {
+        this.showImage = show
+    }
+
+    fun setShowText(show: Boolean) {
+        this.showText = show
     }
 
 }
