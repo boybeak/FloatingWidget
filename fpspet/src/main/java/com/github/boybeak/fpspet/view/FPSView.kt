@@ -154,7 +154,8 @@ class FPSView : SurfaceView {
         val bgTop = borderPaint.strokeWidth
         val bgRight = width.toFloat() - borderPaint.strokeWidth
         val bgBottom = height.toFloat() - borderPaint.strokeWidth
-        canvas.drawRoundRect(bgLeft, bgTop, bgRight, bgBottom, cornerRadius, cornerRadius, bgPaint)
+        val innerCornerRadius = cornerRadius - borderPaint.strokeWidth / 2
+        canvas.drawRoundRect(bgLeft, bgTop, bgRight, bgBottom, innerCornerRadius, innerCornerRadius, bgPaint)
 
         canvas.drawBitmap(currentImage, srcRect, dstRect, null)
         val textWidth = textPaint.measureText(fpsText)
