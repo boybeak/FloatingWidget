@@ -41,18 +41,13 @@ class FPSView : SurfaceView {
     }
 
     private val images = listOf(
-        R.drawable.fa_ducky_walk_000,
-        R.drawable.fa_ducky_walk_001,
-        R.drawable.fa_ducky_walk_002,
-        R.drawable.fa_ducky_walk_003,
-        R.drawable.fa_ducky_walk_004,
-        R.drawable.fa_ducky_walk_005,
-        R.drawable.fa_ducky_walk_006,
-        R.drawable.fa_ducky_walk_007,
-        R.drawable.fa_ducky_walk_008,
-        R.drawable.fa_ducky_walk_009,
-        R.drawable.fa_ducky_walk_010,
-        R.drawable.fa_ducky_walk_011,
+        R.drawable.mona_1,
+        R.drawable.mona_2,
+        R.drawable.mona_3,
+        R.drawable.mona_4,
+        R.drawable.mona_5,
+        R.drawable.mona_6,
+        R.drawable.mona_7,
     )
 
     private val _srcRect = Rect(0, 0, 0, 0)
