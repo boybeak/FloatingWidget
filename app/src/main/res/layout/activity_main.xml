@@ -27,6 +27,12 @@
         android:text="Toogle Click Through"
         />
     <Button
+        android:id="@+id/magneticBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Toggle Magnetic"
+        />
+    <Button
         android:id="@+id/checkParentBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -12,11 +12,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.github.boybeak.fltwgt.FloatingWidget
+import com.github.boybeak.fltwgt.magnetic.Side
 
 class MainActivity : AppCompatActivity() {
 
-    private val widget: FloatingWidget by lazy {
+    private val widget by lazy {
         FloatingWidget.Builder(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+            .setGravity(Gravity.BOTTOM)
+            .setMagnetic(true)
+            .setMagneticSide(Side.Vertical)
             .setDraggable(true)
             .setClickThrough(false)
             .create(this, R.layout.widget_simple)
@@ -46,6 +50,11 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.checkParentBtn).setOnClickListener {
             Log.d("MainActivity", "checkParent: ${widget.view.parent}")
+        }
+        findViewById<Button>(R.id.magneticBtn).setOnClickListener {
+            widget.run {
+                setMagnetic(!isMagnetic)
+            }
         }
 
         findViewById<RadioGroup>(R.id.gravityGroup).setOnCheckedChangeListener { _, checkedId ->
