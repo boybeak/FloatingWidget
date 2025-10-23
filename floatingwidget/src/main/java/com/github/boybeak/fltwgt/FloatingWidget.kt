@@ -34,7 +34,6 @@ class FloatingWidget private constructor(val view: View) {
         private var isDragging = false
 
         private var xMoveDirectionFactor: Int = 0
-
         private var yMoveDirectionFactor: Int = 0
 
         private val params by lazy { view.layoutParams as WindowManager.LayoutParams }
@@ -52,17 +51,15 @@ class FloatingWidget private constructor(val view: View) {
                     initialTouchY = event.rawY
 
                     // 计算移动方向
-                    xMoveDirectionFactor = when (gravity) {
-                        Gravity.LEFT -> 1
+                    xMoveDirectionFactor = when (xGravity) {
                         Gravity.RIGHT -> -1
-                        else -> 0
+                        else -> 1
                     }
 
                     // 计算移动方向
-                    yMoveDirectionFactor = when (gravity) {
-                        Gravity.TOP -> 1
+                    yMoveDirectionFactor = when (yGravity) {
                         Gravity.BOTTOM -> -1
-                        else -> 0
+                        else -> 1
                     }
 
                     isDragging = false
@@ -127,6 +124,15 @@ class FloatingWidget private constructor(val view: View) {
         get() = layoutParams {
             gravity
         } ?: Gravity.NO_GRAVITY
+
+    val xGravity: Int
+        get() {
+            return Gravity.getAbsoluteGravity(gravity, layoutDirection) and Gravity.HORIZONTAL_GRAVITY_MASK
+        }
+    val yGravity: Int
+        get() {
+            return gravity and Gravity.VERTICAL_GRAVITY_MASK
+        }
 
     val x: Int
         get() = layoutParams {

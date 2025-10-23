@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
 
     private val widget by lazy {
         FloatingWidget.Builder(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
-            .setGravity(Gravity.BOTTOM)
+            .setGravity(Gravity.CENTER)
             .setMagnetic(true)
             .setMagneticSide(Side.Vertical)
             .setDraggable(true)
