@@ -64,8 +64,8 @@ class Attraction(
             }
             else -> {
                 Log.d(TAG, "init(CENTER): xGravity = $xGravity ${Gravity.CENTER_HORIZONTAL}")
-                xMap[Side.Start] = x
-                xMap[Side.End] = x
+                xMap[Side.Start] = -screenWidth / 2 + width / 2
+                xMap[Side.End] = screenWidth / 2 - width / 2
             }
         }
         when(yGravity) {
@@ -81,8 +81,8 @@ class Attraction(
             }
             else -> {
                 Log.d(TAG, "init(CENTER): yGravity = $yGravity ${Gravity.CENTER_VERTICAL}")
-                yMap[Side.Top] = y
-                yMap[Side.Bottom] = y
+                yMap[Side.Top] = -screenHeight / 2 + height / 2
+                yMap[Side.Bottom] = screenHeight / 2 - height / 2
             }
         }
 
@@ -115,9 +115,14 @@ class Attraction(
                             xMap[Side.End] ?: x
                         }
                     }
+                    else -> {
+                        targetX = if (x >= 0) {
+                            xMap[Side.End] ?: x
+                        } else {
+                            xMap[Side.Start] ?: x
+                        }
+                    }
                 }
-
-
             }
             else -> {}
         }
@@ -146,6 +151,13 @@ class Attraction(
                             yMap[Side.Top] ?: y
                         } else {
                             yMap[Side.Bottom] ?: y
+                        }
+                    }
+                    else -> {
+                        targetY = if (y >= 0) {
+                            yMap[Side.Bottom] ?: y
+                        } else {
+                            yMap[Side.Top] ?: y
                         }
                     }
                 }

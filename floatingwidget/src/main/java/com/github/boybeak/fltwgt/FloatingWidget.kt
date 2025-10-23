@@ -3,6 +3,7 @@ package com.github.boybeak.fltwgt
 import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
