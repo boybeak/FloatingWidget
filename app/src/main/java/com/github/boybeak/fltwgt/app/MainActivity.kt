@@ -12,14 +12,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.github.boybeak.fltwgt.FloatingWidget
+import com.github.boybeak.fltwgt.magnetic.MagneticStrategy
 import com.github.boybeak.fltwgt.magnetic.Side
 
 class MainActivity : AppCompatActivity() {
 
     private val widget by lazy {
         FloatingWidget.Builder(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
-            .setGravity(Gravity.CENTER_VERTICAL)
+            .setGravity(Gravity.TOP)
             .setMagnetic(true)
+            .setMagneticRadius(100)
+            .setMagneticStrategy(MagneticStrategy.CLOSE_ENOUGH)
             .setSideMargin(Side.Horizontal, 100)
             .setSideMargin(Side.Vertical, 100)
             .setMagneticSide(Side.Bottom)

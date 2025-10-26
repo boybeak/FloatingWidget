@@ -1,31 +1,32 @@
 package com.github.boybeak.fltwgt.magnetic
 
+import android.animation.ValueAnimator
 import android.util.Log
 import android.view.Gravity
+import android.view.animation.LinearInterpolator
 import com.github.boybeak.fltwgt.FloatingWidget
 
 class Attraction(
-    val gravity: Int,
-    val layoutDirection: Int,
-    val x: Int,
-    val y: Int,
-    val width: Int,
-    val height: Int,
-    val screenWidth: Int,
-    val screenHeight: Int,
-    val magneticStrategy: MagneticStrategy,
-    val magneticRadius: Int,
-    val side: Side,
-    val sideMargins: Map<Side, Int>
+    val widget: FloatingWidget
 ) {
     companion object {
         private const val TAG = "Attraction"
     }
 
-    var targetX = x
-        private set
-    var targetY = y
-        private set
+    private val x get() = widget.x
+    private val y get() = widget.y
+
+    private val gravity get() = widget.gravity
+    private val layoutDirection get() = widget.layoutDirection
+    private val magneticStrategy get() = widget.magneticStrategy
+    private val magneticRadius get() = widget.magneticRadius
+    private val sideMargins get() = widget.sideMargins
+    private val side get() = widget.magneticSide
+
+    private val screenWidth get() = widget.screenWidth
+    private val screenHeight get() = widget.screenHeight
+    private val width get() = widget.width
+    private val height get() = widget.height
 
     private val marginOfStartSide: Int get() {
         return sideMargins[Side.Start] ?: sideMargins[Side.Horizontal] ?: 0
@@ -40,22 +41,11 @@ class Attraction(
         return sideMargins[Side.Bottom] ?: sideMargins[Side.Vertical] ?: 0
     }
 
-    constructor(widget: FloatingWidget): this(
-        widget.gravity,
-        widget.layoutDirection,
-        widget.x,
-        widget.y,
-        widget.width,
-        widget.height,
-        widget.screenWidth,
-        widget.screenHeight,
-        widget.magneticStrategy,
-        widget.magneticRadius,
-        widget.magneticSide,
-        widget.sideMargins
-    )
+    private val isCloseEnoughStrategy: Boolean get() {
+        return magneticStrategy == MagneticStrategy.CLOSE_ENOUGH
+    }
 
-    init {
+    fun animate() {
         val xGravity = Gravity.getAbsoluteGravity(gravity, layoutDirection) and Gravity.HORIZONTAL_GRAVITY_MASK
         val yGravity = gravity and Gravity.VERTICAL_GRAVITY_MASK
 
@@ -65,46 +55,77 @@ class Attraction(
         val xMap = HashMap<Side, Int>()
         val yMap = HashMap<Side, Int>()
 
+        var targetX = widget.x
+        var targetY = widget.y
+
         when(xGravity) {
             Gravity.LEFT -> {
-                Log.d(TAG, "init(LEFT): xGravity = $xGravity")
+                val xTargetStart = marginOfStartSide
+                val xTargetEnd = screenWidth - width - marginOfEndSide
 
-                xMap[Side.Start] = marginOfStartSide
-                xMap[Side.End] = screenWidth - width - marginOfEndSide
+                val shouldSnapStart = if (isCloseEnoughStrategy) x <= xTargetStart + magneticRadius else true
+                val shouldSnapEnd = if (isCloseEnoughStrategy) x >= xTargetEnd - magneticRadius else true
+
+                xMap[Side.Start] = if (shouldSnapStart) xTargetStart else x
+                xMap[Side.End] = if (shouldSnapEnd) xTargetEnd else x
             }
             Gravity.RIGHT -> {
-                Log.d(TAG, "init(LEFT): xGravity = $xGravity")
+                val xTargetStart = screenWidth - width - marginOfEndSide
+                val xTargetEnd = marginOfStartSide
 
-                xMap[Side.Start] = screenWidth - width - marginOfEndSide
-                xMap[Side.End] = marginOfStartSide
+                val shouldSnapStart = if (isCloseEnoughStrategy) x >= xTargetStart - magneticRadius else true
+                val shouldSnapEnd = if (isCloseEnoughStrategy) x <= xTargetEnd + magneticRadius else true
+
+                xMap[Side.Start] = if (shouldSnapStart) xTargetStart else x
+                xMap[Side.End] = if (shouldSnapEnd) xTargetEnd else x
             }
             else -> {
-                Log.d(TAG, "init(CENTER): xGravity = $xGravity ${Gravity.CENTER_HORIZONTAL}")
-                xMap[Side.Start] = -screenWidth / 2 + width / 2 + marginOfStartSide
-                xMap[Side.End] = screenWidth / 2 - width / 2 - marginOfEndSide
+                val xTargetStart = -screenWidth / 2 + width / 2 + marginOfStartSide
+                val xTargetEnd = screenWidth / 2 - width / 2 - marginOfEndSide
+
+                val shouldSnapStart = if (isCloseEnoughStrategy) x <= xTargetStart + magneticRadius else true
+                val shouldSnapEnd = if (isCloseEnoughStrategy) x >= xTargetEnd - magneticRadius else true
+
+                xMap[Side.Start] = if (shouldSnapStart) xTargetStart else x
+                xMap[Side.End] = if (shouldSnapEnd) xTargetEnd else x
             }
         }
         when(yGravity) {
             Gravity.TOP -> {
-                Log.d(TAG, "init(TOP): yGravity = $yGravity")
-                yMap[Side.Top] = marginOfTopSide
-                yMap[Side.Bottom] = screenHeight - height - marginOfBottomSide
+                val yTargetTop = marginOfTopSide
+                val yTargetBottom = screenHeight - height - marginOfBottomSide
+
+                val shouldSnapTop = if (isCloseEnoughStrategy) y <= yTargetTop + magneticRadius else true
+                val shouldSnapBottom = if (isCloseEnoughStrategy) y >= yTargetBottom - magneticRadius else true
+
+                yMap[Side.Top] = if (shouldSnapTop) yTargetTop else y
+                yMap[Side.Bottom] = if (shouldSnapBottom) yTargetBottom else y
             }
             Gravity.BOTTOM -> {
-                Log.d(TAG, "init(TOP): yGravity = $yGravity")
-                yMap[Side.Top] = screenHeight - height - marginOfBottomSide
-                yMap[Side.Bottom] = marginOfTopSide
+                val yTargetTop = screenHeight - height - marginOfBottomSide
+                val yTargetBottom = marginOfTopSide
+
+                val shouldSnapTop = if (isCloseEnoughStrategy) y >= yTargetTop - magneticRadius else true
+                val shouldSnapBottom = if (isCloseEnoughStrategy) y <= yTargetBottom + magneticRadius else true
+
+                yMap[Side.Top] = if (shouldSnapTop) yTargetTop else y
+                yMap[Side.Bottom] = if (shouldSnapBottom) yTargetBottom else y
             }
             else -> {
-                Log.d(TAG, "init(CENTER): yGravity = $yGravity ${Gravity.CENTER_VERTICAL}")
-                yMap[Side.Top] = -screenHeight / 2 + height / 2 + marginOfTopSide
-                yMap[Side.Bottom] = screenHeight / 2 - height / 2 - marginOfBottomSide
+                val yTargetTop = -screenHeight / 2 + height / 2 + marginOfTopSide
+                val yTargetBottom = screenHeight / 2 - height / 2 - marginOfBottomSide
+
+                val shouldSnapTop = if (isCloseEnoughStrategy) y <= yTargetTop + magneticRadius else true
+                val shouldSnapBottom = if (isCloseEnoughStrategy) y >= yTargetBottom - magneticRadius else true
+
+                yMap[Side.Top] = if (shouldSnapTop) yTargetTop else y
+                yMap[Side.Bottom] = if (shouldSnapBottom) yTargetBottom else y
             }
         }
 
         val xDirection = side.direction and Side.Horizontal.direction
         val yDirection = side.direction and Side.Vertical.direction
-        Log.d(TAG, "sideMargins.start=${sideMargins[Side.Start]} end=${sideMargins[Side.End]}")
+
         when (xDirection) {
             Side.Start.direction -> {
                 targetX = (xMap[Side.Start] ?: x)
@@ -182,43 +203,34 @@ class Attraction(
             }
             else -> {}
         }
+
+        animateMagneticAttraction(targetX, targetY)
     }
 
-    /*fun shouldAnimate(): Boolean {
-        return when (magneticStrategy) {
-            MagneticStrategy.CLOSE_ENOUGH -> {
-                return closeEnoughSides()
-            }
-            else -> true
-        }
-    }*/
+    private fun animateMagneticAttraction(targetX: Int, targetY: Int) {
 
-    /*fun closeEnoughSides(xMap: Map<Side, Int>, yMap: Map<Side, Int>): Pair<Side?, Side?> {
-        val xDirection = side.direction and Side.Horizontal.direction
-        val yDirection = side.direction and Side.Vertical.direction
-        val xSide: Side? = null
-        val ySide: Side? = null
-        when (xDirection) {
-            Side.Start.direction -> {
-                x - xMap[]
-            }
-            Side.End.direction -> {
+        val x = this@Attraction.x
+        val y = this@Attraction.y
 
-            }
-            Side.Horizontal.direction -> {
-            }
-            else -> false
-        }
-        when(yDirection) {
-            Side.Top.direction -> {
-            }
-            Side.Bottom.direction -> {
-            }
-            Side.Vertical.direction -> {
-            }
-            else -> false
-        }
+        Log.d(TAG, "animateMagneticAttraction targetX=$targetX targetY=$targetY")
 
-        return Pair(xSide, ySide)
-    }*/
+        // 添加属性动画
+        if (targetX != x || targetY != y) {
+            ValueAnimator.ofFloat(0f, 1f).apply {
+                duration = 200
+                interpolator = LinearInterpolator()
+                addUpdateListener { animation ->
+                    val fraction = animation.animatedValue as Float
+                    if (widget.isShowing) {
+                        widget.update {
+                            this.x = (x + (targetX - x) * fraction).toInt()
+                            this.y = (y + (targetY - y) * fraction).toInt()
+                        }
+                    }
+                }
+                start()
+            }
+        }
+    }
+
 }

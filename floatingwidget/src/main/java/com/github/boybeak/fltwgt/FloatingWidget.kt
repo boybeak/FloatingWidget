@@ -180,6 +180,10 @@ class FloatingWidget private constructor(val view: View) {
 
     val layoutDirection: Int get() = view.layoutDirection
 
+    private val attraction by lazy {
+        Attraction(this)
+    }
+
     fun setSize(width: Int, height: Int) = update {
         this.width = width
         this.height = height
@@ -242,34 +246,10 @@ class FloatingWidget private constructor(val view: View) {
         if (!isShowing) return
         if (!isMagnetic) return
 
-        val winLayoutParams = view.layoutParams as? WindowManager.LayoutParams ?: return
-        val attraction = Attraction(this)
-
-        fun animateMagneticAttraction(targetX: Int, targetY: Int) {
-            // 添加属性动画
-            if (targetX != x || targetY != y) {
-                ValueAnimator.ofFloat(0f, 1f).apply {
-                    duration = 200
-                    interpolator = LinearInterpolator()
-                    addUpdateListener { animation ->
-                        val fraction = animation.animatedValue as Float
-                        winLayoutParams.x = (x + (targetX - x) * fraction).toInt()
-                        winLayoutParams.y = (y + (targetY - y) * fraction).toInt()
-                        if (isShowing) {
-                            windowManager.updateViewLayout(view, winLayoutParams)
-                        }
-                    }
-                    start()
-                }
-            }
-        }
-
-        Log.d(TAG, "attraction.targetX=${attraction.targetX} targetY=${attraction.targetY} width=${width}")
-        animateMagneticAttraction(attraction.targetX, attraction.targetY)
-
+        attraction.animate()
     }
 
-    private fun update(block: WindowManager.LayoutParams.() -> Unit) {
+    internal fun update(block: WindowManager.LayoutParams.() -> Unit) {
         val winLayoutParams = view.layoutParams as? WindowManager.LayoutParams ?: return
         block(winLayoutParams)
         if (isShowing) {
