@@ -11,8 +11,10 @@ import android.view.View
 import android.view.WindowManager
 import android.view.animation.LinearInterpolator
 import com.github.boybeak.fltwgt.magnetic.Attraction
+import com.github.boybeak.fltwgt.magnetic.MagneticStrategy
 import com.github.boybeak.fltwgt.magnetic.Side
 import kotlin.math.abs
+import kotlin.math.max
 
 class FloatingWidget private constructor(val view: View) {
 
@@ -113,10 +115,15 @@ class FloatingWidget private constructor(val view: View) {
 
     var isMagnetic: Boolean = false
         private set
+    var magneticStrategy: MagneticStrategy = MagneticStrategy.ALWAYS
+        private set
     var magneticRadius: Int = -1
         private set
     var magneticSide: Side = Side.All
         private set
+    private val _sideMargins = HashMap<Side, Int>()
+    val sideMargins: Map<Side, Int>
+        get() = _sideMargins
 
     val isShowing: Boolean
         get() = view.parent != null
@@ -146,14 +153,10 @@ class FloatingWidget private constructor(val view: View) {
         } ?: 0
 
     val width: Int
-        get() = layoutParams {
-            width
-        } ?: 0
+        get() = view.width
 
     val height: Int
-        get() = layoutParams {
-            height
-        } ?: 0
+        get() = view.height
 
     val screenWidth: Int
         get() {
@@ -197,17 +200,27 @@ class FloatingWidget private constructor(val view: View) {
 
     fun setMagnetic(enable: Boolean) {
         this.isMagnetic = enable
-        if (isShowing) {
-            magneticAttraction()
-        }
+        magneticAttraction()
+    }
+
+    fun setMagneticStrategy(strategy: MagneticStrategy) {
+        this.magneticStrategy = strategy
+        magneticAttraction()
     }
 
     fun setMagneticRadius(radius: Int) {
         this.magneticRadius = radius
+        magneticAttraction()
     }
 
     fun setMagneticSide(side: Side) {
         this.magneticSide = side
+        magneticAttraction()
+    }
+
+    fun setSideMargin(side: Side, margin: Int) {
+        _sideMargins[side] = max(0, margin)
+        magneticAttraction()
     }
 
     private fun show(layoutParams: WindowManager.LayoutParams) {
@@ -216,6 +229,9 @@ class FloatingWidget private constructor(val view: View) {
 
     fun show() {
         windowManager.addView(view, view.layoutParams as WindowManager.LayoutParams)
+        view.post {
+            magneticAttraction()
+        }
     }
 
     fun dismiss() {
@@ -225,28 +241,9 @@ class FloatingWidget private constructor(val view: View) {
     private fun magneticAttraction() {
         if (!isShowing) return
         if (!isMagnetic) return
-        val attraction = Attraction(this)
+
         val winLayoutParams = view.layoutParams as? WindowManager.LayoutParams ?: return
-        /*val display = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            view.context.display
-        } else {
-            windowManager.defaultDisplay
-        }
-        val screenWidth = display.width
-        val screenHeight = display.height
-        val screenCenterX = screenWidth / 2f
-        val screenCenterY = screenHeight / 2f
-        Log.d("FloatingWidget", "magneticAttraction: $screenWidth, $screenHeight")
-        val widgetWidth = winLayoutParams.width
-        val widgetHeight = winLayoutParams.height
-        val currentX = winLayoutParams.x.toFloat()
-        val currentY = winLayoutParams.y.toFloat()
-
-        val centerX = currentX + widgetWidth / 2
-        val centerY = currentY + widgetHeight / 2
-
-        var targetX = currentX
-        var targetY = currentY*/
+        val attraction = Attraction(this)
 
         fun animateMagneticAttraction(targetX: Int, targetY: Int) {
             // 添加属性动画
@@ -267,19 +264,8 @@ class FloatingWidget private constructor(val view: View) {
             }
         }
 
+        Log.d(TAG, "attraction.targetX=${attraction.targetX} targetY=${attraction.targetY} width=${width}")
         animateMagneticAttraction(attraction.targetX, attraction.targetY)
-
-        // 计算目标位置（保留现有位置判断逻辑）
-        /*if (currentX < 0) {
-            targetX = 0f
-        } else if (currentX + widgetWidth > screenWidth) {
-            targetX = (screenWidth - widgetWidth).toFloat()
-        }
-        if (currentY < 0) {
-            targetY = 0f
-        } else if (currentY + widgetHeight > screenHeight) {
-            targetY = (screenHeight - widgetHeight).toFloat()
-        }*/
 
     }
 
@@ -307,8 +293,10 @@ class FloatingWidget private constructor(val view: View) {
 
         private var draggable = false
         private var magnetic = false
+        private var magneticStrategy: MagneticStrategy = MagneticStrategy.ALWAYS
         private var magneticRadius = -1
         private var magneticSide: Side = Side.Horizontal
+        private val sideMargins = HashMap<Side, Int>()
 
         constructor() : this(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -343,6 +331,11 @@ class FloatingWidget private constructor(val view: View) {
             return this
         }
 
+        fun setMagneticStrategy(strategy: MagneticStrategy): Builder {
+            this.magneticStrategy = strategy
+            return this
+        }
+
         fun setMagneticRadius(radius: Int): Builder {
             this.magneticRadius = radius
             return this
@@ -353,10 +346,20 @@ class FloatingWidget private constructor(val view: View) {
             return this
         }
 
+        fun setSideMargin(side: Side, margin: Int): Builder {
+            sideMargins[side] = max(0, margin)
+            return this
+        }
+
         fun create(view: View): FloatingWidget {
             return FloatingWidget(view).apply {
                 setDraggable(this@Builder.draggable)
 
+                this@Builder.sideMargins.forEach { (side, margin) ->
+                    setSideMargin(side, margin)
+                }
+
+                setMagneticStrategy(this@Builder.magneticStrategy)
                 setMagneticRadius(this@Builder.magneticRadius)
                 setMagneticSide(this@Builder.magneticSide)
                 setMagnetic(this@Builder.magnetic)

@@ -18,9 +18,11 @@ class MainActivity : AppCompatActivity() {
 
     private val widget by lazy {
         FloatingWidget.Builder(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
-            .setGravity(Gravity.CENTER)
+            .setGravity(Gravity.CENTER_VERTICAL)
             .setMagnetic(true)
-            .setMagneticSide(Side.Vertical)
+            .setSideMargin(Side.Horizontal, 100)
+            .setSideMargin(Side.Vertical, 100)
+            .setMagneticSide(Side.Bottom)
             .setDraggable(true)
             .setClickThrough(false)
             .create(this, R.layout.widget_simple)
