@@ -1,22 +1,19 @@
 package com.github.boybeak.fltwgt
 
-import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
-import android.view.animation.LinearInterpolator
 import com.github.boybeak.fltwgt.magnetic.Attraction
 import com.github.boybeak.fltwgt.magnetic.MagneticStrategy
 import com.github.boybeak.fltwgt.magnetic.Side
 import kotlin.math.abs
 import kotlin.math.max
 
-class FloatingWidget private constructor(val view: View) {
+open class FloatingWidget private constructor(val view: View) {
 
     companion object {
         private const val TAG = "FloatingWidget"
