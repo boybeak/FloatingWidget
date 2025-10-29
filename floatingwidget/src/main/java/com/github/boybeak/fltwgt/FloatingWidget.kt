@@ -13,7 +13,7 @@ import com.github.boybeak.fltwgt.magnetic.Side
 import kotlin.math.abs
 import kotlin.math.max
 
-open class FloatingWidget private constructor(val view: View) {
+class FloatingWidget private constructor(val view: View) {
 
     companion object {
         private const val TAG = "FloatingWidget"
