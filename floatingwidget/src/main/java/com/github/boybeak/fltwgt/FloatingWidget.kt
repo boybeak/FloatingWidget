@@ -224,6 +224,11 @@ class FloatingWidget private constructor(val view: View) {
         magneticAttraction()
     }
 
+    fun setPosition(x: Int, y: Int) = update {
+        this.x = x
+        this.y = y
+    }
+
     private fun show(layoutParams: WindowManager.LayoutParams) {
         windowManager.addView(view, layoutParams)
     }
@@ -325,6 +330,12 @@ class FloatingWidget private constructor(val view: View) {
 
         fun setSideMargin(side: Side, margin: Int): Builder {
             sideMargins[side] = max(0, margin)
+            return this
+        }
+
+        fun setPosition(x: Int, y: Int): Builder {
+            layoutParams.x = x
+            layoutParams.y = y
             return this
         }
 
