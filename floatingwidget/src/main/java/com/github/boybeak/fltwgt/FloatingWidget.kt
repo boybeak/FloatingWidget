@@ -237,6 +237,14 @@ class FloatingWidget private constructor(val view: View) {
         this.y = y
     }
 
+    fun setWidth(width: Int) = update {
+        this.width = width
+    }
+
+    fun setHeight(height: Int) = update {
+        this.height = height
+    }
+
     private fun show(layoutParams: WindowManager.LayoutParams) {
         windowManager.addView(view, layoutParams)
     }
@@ -354,6 +362,16 @@ class FloatingWidget private constructor(val view: View) {
 
         fun setY(y: Int): Builder {
             layoutParams.y = y
+            return this
+        }
+
+        fun setWidth(width: Int): Builder {
+            layoutParams.width = width
+            return this
+        }
+
+        fun setHeight(height: Int): Builder {
+            layoutParams.height = height
             return this
         }
 
