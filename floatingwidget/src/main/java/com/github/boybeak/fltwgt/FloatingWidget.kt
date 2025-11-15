@@ -194,6 +194,10 @@ class FloatingWidget private constructor(val view: View) {
         this.setClickThrough(enabled)
     }
 
+    fun setIgnoreLimits(ignore: Boolean) = update {
+        this.setIgnoreLimits(ignore)
+    }
+
     fun setDraggable(draggable: Boolean) {
         view.setOnTouchListener(if (draggable) dragBehavior else null)
         isDraggable = draggable
@@ -319,6 +323,11 @@ class FloatingWidget private constructor(val view: View) {
             return this
         }
 
+        fun setIgnoreLimits(ignore: Boolean): Builder {
+            layoutParams.setIgnoreLimits(ignore)
+            return this
+        }
+
         fun setDraggable(draggable: Boolean): Builder {
             this.draggable = draggable
             return this
@@ -414,5 +423,13 @@ private fun WindowManager.LayoutParams.setClickThrough(enabled: Boolean) {
     } else {
         this.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
         this.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+    }
+}
+
+private fun WindowManager.LayoutParams.setIgnoreLimits(ignore: Boolean) {
+    this.flags = if (ignore) {
+        this.flags or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+    } else {
+        this.flags and WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS.inv()
     }
 }
